@@ -57,6 +57,9 @@ pub enum Action {
         /// fail if key already exists in the stash
         #[arg(short = 'p', long = "prevent-overwrite")]
         prevent_overwrite: bool,
+        /// echo contents back to stdout
+        #[arg(short = 'e', long = "echo")]
+        echo: bool,
         /// whether to output information about the stashed file
         #[arg(short = 'v', long = "verbose")]
         verbose: bool,

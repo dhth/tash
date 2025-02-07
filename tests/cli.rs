@@ -52,7 +52,7 @@ fn pushing_content_from_flag_works() {
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("p");
     cmd.arg("key");
-    cmd.arg("-d=\"content goes here\"");
+    cmd.arg("-d=content goes here");
     let output = cmd.output().expect("command should've been executed");
 
     // THEN
@@ -85,6 +85,33 @@ fn pushing_content_from_local_file_works() {
         println!("stderr: \n{}", stderr);
     }
     assert!(output.status.success(), "output wasn't a success");
+}
+
+#[test]
+fn pushing_and_echoing_content_works() {
+    // GIVEN
+    let fixture = Fixture::new();
+
+    // WHEN
+    let mut cmd =
+        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+    cmd.arg("p");
+    cmd.arg("key");
+    cmd.arg("-d=content goes here");
+    cmd.arg("-e");
+    let output = cmd.output().expect("command should've been executed");
+
+    // THEN
+    if !output.status.success() {
+        let stderr = String::from_utf8(output.stderr)
+            .expect("a string should've been created from command stderr");
+        println!("stderr: \n{}", stderr);
+    }
+    assert!(output.status.success(), "output wasn't a success");
+    let stdout =
+        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
+    assert_eq!(stdout.as_str(), "content goes here");
 }
 
 #[test]
@@ -430,7 +457,7 @@ fn fails_if_content_overwrites_are_not_desired() {
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("p");
     cmd.arg("key");
-    cmd.arg("-d=\"content goes here\"");
+    cmd.arg("-d=content goes here");
     cmd.arg("-p");
     let output = cmd.output().expect("command should've been executed");
 

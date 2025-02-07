@@ -48,6 +48,7 @@ pub fn handle(args: Args) -> Result<(), AppError> {
             file_path,
             get_content_from_clipboard,
             prevent_overwrite,
+            echo,
             verbose,
         } => {
             push_content(
@@ -57,6 +58,7 @@ pub fn handle(args: Args) -> Result<(), AppError> {
                 file_path.as_deref(),
                 get_content_from_clipboard,
                 prevent_overwrite,
+                echo,
                 verbose,
             )
             .map_err(PushContent)?;

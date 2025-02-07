@@ -56,6 +56,7 @@ impl AppError {
                 PushError::CouldntReadFromSystemClipboard(_) => Some(504),
                 PushError::ContentTooLarge(_) => None,
                 PushError::CouldntWriteToFile(_) => Some(505),
+                PushError::CouldntEchoContent(_) => Some(506),
             },
             AppError::DeleteContent(e) => match e {
                 DeleteError::KeysDontExist(_) => None,

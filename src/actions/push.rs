@@ -30,8 +30,11 @@ pub enum PushError {
     ContentTooLarge(usize),
     #[error("couldn't write to file in tash's data directory: {0}")]
     CouldntWriteToFile(IOError),
+    #[error("couldn't echo content back to stdout: {0}")]
+    CouldntEchoContent(std::string::FromUtf8Error),
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn push_content(
     data_dir: &Path,
     key: &str,
@@ -39,6 +42,7 @@ pub fn push_content(
     file_path: Option<&str>,
     get_content_from_clipboard: bool,
     prevent_overwrite: bool,
+    echo: bool,
     verbose: bool,
 ) -> Result<(), PushError> {
     let re = Regex::new(KEY_REGEX_STR).expect("regex is invalid");
@@ -96,6 +100,11 @@ pub fn push_content(
 
     if verbose {
         println!("stashed {} bytes", content.len());
+    }
+
+    if echo {
+        let content_str = String::from_utf8(content).map_err(PushError::CouldntEchoContent)?;
+        print!("{}", content_str);
     }
 
     Ok(())
