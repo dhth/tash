@@ -95,7 +95,15 @@ finder like [fzf](https://github.com/junegunn/fzf).
 ```bash
 #!/usr/bin/env bash
 
-selected_key=$(tash ls | fzf)
+selected_key=$(
+    tash ls |
+        fzf \
+            --reverse \
+            --preview 'tash get {}' \
+            --preview-window=right:70% \
+            --preview-border=vertical \
+            --border=none
+)
 
 if [ -z "$selected_key" ]; then
     exit 0
@@ -109,7 +117,17 @@ tash get "${selected_key}" -nc
 ```bash
 #!/usr/bin/env bash
 
-selected_keys=$(tash ls | fzf --multi | xargs)
+selected_keys=$(
+    tash ls |
+        fzf \
+            --multi \
+            --reverse \
+            --preview 'tash get {}' \
+            --preview-window=right:70% \
+            --preview-border=vertical \
+            --border=none |
+        xargs
+)
 
 if [ -z "$selected_keys" ]; then
     exit 0
