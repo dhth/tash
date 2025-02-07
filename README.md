@@ -54,37 +54,37 @@ here.
 EOF
 
 # push content to tash from a file
-tash p key -f path/to/file.txt
+tash push key -f path/to/file.txt
 
 # push content from a flag
-tash p key -d "content goes here"
+tash push key -d "content goes here"
 
 # push content while preventing overwrites
-tash p key -d "content goes here" -p
+tash push key -d "content goes here" -p
 
 # push content to tash from system clipboard
-tash p key -c
+tash push key -c
 
 # get content from tash
-tash g key
+tash get key
 
 # get content from tash and copy to system clipboard
-tash g key -c
+tash get key -c
 
 # get content from tash and only copy to system clipboard
-tash g key -c --no-output
+tash get key -c --no-output
 
 # get content from tash and remove it from its store
-tash g key --pop
+tash get key --pop
 
 # list content saved to tash
 tash ls
 
 # delete content items
-tash d key1 key2 key3
+tash delete key1 key2 key3
 
 # empty tash's store
-tash e
+tash empty
 ```
 
 ### Fetch content using fzf
@@ -101,7 +101,7 @@ if [ -z "$selected_key" ]; then
     exit 0
 fi
 
-tash g "${selected_key}" -nc
+tash get "${selected_key}" -nc
 ```
 
 ### Delete multiple entries using fzf
@@ -115,5 +115,5 @@ if [ -z "$selected_keys" ]; then
     exit 0
 fi
 
-tash d ${selected_keys}
+tash delete ${selected_keys}
 ```
