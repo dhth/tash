@@ -1,0 +1,24 @@
+name: audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 0'
+  push:
+    branches: ["main"]
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - ".github/workflows/audit.yml"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+      - name: cargo audit
+        run: cargo audit
