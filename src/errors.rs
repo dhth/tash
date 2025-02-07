@@ -23,7 +23,7 @@ impl AppError {
     pub fn code(&self) -> Option<u16> {
         match self {
             AppError::GetDataDir => None,
-            AppError::DataDirEnvVarInvalid(_) => Some(100),
+            AppError::DataDirEnvVarInvalid(_) => None,
             AppError::CreateDataDir(_) => Some(101),
             AppError::EmptyStash(e) => match e {
                 EmptyError::ReadFromDataDir(_) => Some(200),
