@@ -1,6 +1,6 @@
 use crate::errors::AppError::{self, *};
 
-use crate::actions::{empty_stash, get_content, list_content, push_content};
+use crate::actions::{delete_content_items, empty_stash, get_content, list_content, push_content};
 use crate::args::{Action, Args};
 use dirs::data_dir;
 use std::path::PathBuf;
@@ -25,6 +25,9 @@ pub fn handle(args: Args) -> Result<(), AppError> {
     }
 
     match args.action {
+        Action::D { keys } => {
+            delete_content_items(&data_dir, &keys).map_err(DeleteContent)?;
+        }
         Action::E { skip_confirmation } => {
             empty_stash(&data_dir, skip_confirmation).map_err(EmptyStash)?;
         }

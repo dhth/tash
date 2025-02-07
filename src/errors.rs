@@ -1,4 +1,4 @@
-use crate::actions::{EmptyError, GetError, ListError, PushError};
+use crate::actions::{DeleteError, EmptyError, GetError, ListError, PushError};
 use std::io::Error as IOError;
 
 #[derive(thiserror::Error, Debug)]
@@ -17,6 +17,8 @@ pub enum AppError {
     ListContent(ListError),
     #[error("couldn't push content: {0}")]
     PushContent(PushError),
+    #[error("couldn't delete content: {0}")]
+    DeleteContent(DeleteError),
 }
 
 impl AppError {
@@ -54,6 +56,10 @@ impl AppError {
                 PushError::CouldntReadFromSystemClipboard(_) => Some(504),
                 PushError::ContentTooLarge(_) => None,
                 PushError::CouldntWriteToFile(_) => Some(505),
+            },
+            AppError::DeleteContent(e) => match e {
+                DeleteError::KeysDontExist(_) => None,
+                DeleteError::CouldntRemoveFiles(_, _) => Some(600),
             },
         }
     }

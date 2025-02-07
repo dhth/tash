@@ -11,6 +11,12 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum Action {
+    /// Delete one or more content items
+    D {
+        /// keys to delete
+        #[arg(value_name = "KEY")]
+        keys: Vec<String>,
+    },
     /// Empty entire stash
     E {
         /// skip confirmation

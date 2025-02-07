@@ -256,6 +256,59 @@ key-c
 }
 
 #[test]
+fn deleting_content_items_works() {
+    // GIVEN
+    let fixture = Fixture::new();
+    let keys = vec!["key-b", "key-c", "key-a"];
+    for key in keys {
+        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+            .expect("push command should've been created");
+        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+        push_cmd.arg("p");
+        push_cmd.arg(key);
+        push_cmd.arg("-f=tests/sample.txt");
+        push_cmd
+            .output()
+            .expect("push command should've been executed");
+    }
+
+    // WHEN
+    let mut cmd =
+        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("delete command should've been created");
+    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+    cmd.arg("d");
+    cmd.arg("key-a");
+    cmd.arg("key-b");
+    let output = cmd
+        .output()
+        .expect("delete command should've been executed");
+
+    let mut ls_cmd =
+        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("ls command should've been created");
+    ls_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+    ls_cmd.arg("ls");
+    let ls_output = ls_cmd.output().expect("ls command should've been executed");
+
+    // THEN
+    if !output.status.success() {
+        let stderr = String::from_utf8(output.stderr)
+            .expect("a string should've been created from command stderr");
+        println!("stderr: \n{}", stderr);
+    }
+    assert!(output.status.success(), "delete output wasn't a success");
+
+    if !ls_output.status.success() {
+        let stderr = String::from_utf8(ls_output.stderr)
+            .expect("a string should've been created from ls_command stderr");
+        println!("stderr: \n{}", stderr);
+    }
+    assert!(ls_output.status.success(), "ls_output wasn't a success");
+    let ls_stdout = String::from_utf8(ls_output.stdout)
+        .expect("a string should've been created from ls_cmd stdout");
+    assert_eq!(ls_stdout.as_str().trim(), "key-c")
+}
+
+#[test]
 fn emptying_stash_works() {
     // GIVEN
     let fixture = Fixture::new();
@@ -391,4 +444,42 @@ fn fails_if_content_overwrites_are_not_desired() {
     let stderr =
         String::from_utf8(output.stderr).expect("a string should've been created from cmd stderr");
     assert!(stderr.as_str().contains("key already exists in the stash"));
+}
+
+#[test]
+fn deletion_fails_if_one_or_more_keys_dont_exist() {
+    // GIVEN
+    let fixture = Fixture::new();
+    let keys = vec!["key-b", "key-c", "key-a"];
+    for key in keys {
+        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
+            .expect("push command should've been created");
+        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+        push_cmd.arg("p");
+        push_cmd.arg(key);
+        push_cmd.arg("-f=tests/sample.txt");
+        push_cmd
+            .output()
+            .expect("push command should've been executed");
+    }
+
+    // WHEN
+    let mut cmd =
+        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+    cmd.arg("d");
+    cmd.arg("non-existent-key");
+    cmd.arg("key-b");
+    let output = cmd.output().expect("get command should've been executed");
+
+    // THEN
+    if output.status.success() {
+        let stdout = String::from_utf8(output.stdout)
+            .expect("a string should've been created from command stdout");
+        println!("stdout: \n{}", stdout);
+    }
+    assert!(!output.status.success(), "output wasn't a failure");
+    let stderr =
+        String::from_utf8(output.stderr).expect("a string should've been created from cmd stderr");
+    assert!(stderr.as_str().contains("keys don't exist in stash"));
 }
