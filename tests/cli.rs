@@ -50,7 +50,7 @@ fn pushing_content_from_flag_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("p");
+    cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
     let output = cmd.output().expect("command should've been executed");
@@ -73,7 +73,7 @@ fn pushing_content_from_local_file_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("p");
+    cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-f=tests/sample.txt");
     let output = cmd.output().expect("command should've been executed");
@@ -96,7 +96,7 @@ fn pushing_and_echoing_content_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("p");
+    cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
     cmd.arg("-e");
@@ -146,7 +146,7 @@ fn getting_content_works() {
     let mut push_cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("push command should've been created");
     push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    push_cmd.arg("p");
+    push_cmd.arg("push");
     push_cmd.arg("key");
     push_cmd.arg("-f=tests/sample.txt");
     push_cmd
@@ -157,7 +157,7 @@ fn getting_content_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("g");
+    cmd.arg("get");
     cmd.arg("key");
     let output = cmd.output().expect("get command should've been executed");
 
@@ -185,7 +185,7 @@ fn getting_content_and_popping_works() {
     let mut push_cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("push command should've been created");
     push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    push_cmd.arg("p");
+    push_cmd.arg("push");
     push_cmd.arg("key");
     push_cmd.arg("-f=tests/sample.txt");
     push_cmd
@@ -196,7 +196,7 @@ fn getting_content_and_popping_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("g");
+    cmd.arg("get");
     cmd.arg("key");
     cmd.arg("-p");
     let output = cmd.output().expect("get command should've been executed");
@@ -204,7 +204,7 @@ fn getting_content_and_popping_works() {
     let mut second_get_cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
     second_get_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    second_get_cmd.arg("g");
+    second_get_cmd.arg("get");
     second_get_cmd.arg("key");
     let second_cmd_output = second_get_cmd
         .output()
@@ -249,7 +249,7 @@ fn listing_content_works() {
         let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
             .expect("push command should've been created");
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("p");
+        push_cmd.arg("push");
         push_cmd.arg(key);
         push_cmd.arg("-f=tests/sample.txt");
         push_cmd
@@ -291,7 +291,7 @@ fn deleting_content_items_works() {
         let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
             .expect("push command should've been created");
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("p");
+        push_cmd.arg("push");
         push_cmd.arg(key);
         push_cmd.arg("-f=tests/sample.txt");
         push_cmd
@@ -303,7 +303,7 @@ fn deleting_content_items_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("delete command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("d");
+    cmd.arg("delete");
     cmd.arg("key-a");
     cmd.arg("key-b");
     let output = cmd
@@ -344,7 +344,7 @@ fn emptying_stash_works() {
         let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
             .expect("push command should've been created");
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("p");
+        push_cmd.arg("push");
         push_cmd.arg(key);
         push_cmd.arg("-f=tests/sample.txt");
         push_cmd
@@ -356,7 +356,7 @@ fn emptying_stash_works() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("empty command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("e");
+    cmd.arg("empty");
     cmd.arg("-y");
     let output = cmd.output().expect("empty command should've been executed");
 
@@ -394,7 +394,7 @@ fn fails_if_key_doesnt_conform_to_regex() {
         let mut cmd =
             Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
         cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        cmd.arg("p");
+        cmd.arg("push");
         cmd.arg(incorrect_key);
         cmd.arg("-f=tests/sample.txt");
         let output = cmd.output().expect("get command should've been executed");
@@ -421,7 +421,7 @@ fn fails_if_key_doesnt_exist() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("g");
+    cmd.arg("get");
     cmd.arg("non-existent-key");
     let output = cmd.output().expect("get command should've been executed");
 
@@ -444,7 +444,7 @@ fn fails_if_content_overwrites_are_not_desired() {
     let mut first_push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
         .expect("first push command should've been created");
     first_push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    first_push_cmd.arg("p");
+    first_push_cmd.arg("push");
     first_push_cmd.arg("key");
     first_push_cmd.arg("-d=\"content goes here\"");
     first_push_cmd
@@ -455,7 +455,7 @@ fn fails_if_content_overwrites_are_not_desired() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("p");
+    cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
     cmd.arg("-p");
@@ -482,7 +482,7 @@ fn deletion_fails_if_one_or_more_keys_dont_exist() {
         let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
             .expect("push command should've been created");
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("p");
+        push_cmd.arg("push");
         push_cmd.arg(key);
         push_cmd.arg("-f=tests/sample.txt");
         push_cmd
@@ -494,7 +494,7 @@ fn deletion_fails_if_one_or_more_keys_dont_exist() {
     let mut cmd =
         Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("d");
+    cmd.arg("delete");
     cmd.arg("non-existent-key");
     cmd.arg("key-b");
     let output = cmd.output().expect("get command should've been executed");

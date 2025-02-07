@@ -12,13 +12,13 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Action {
     /// Delete one or more content items
-    D {
+    Delete {
         /// keys to delete
         #[arg(value_name = "KEY")]
         keys: Vec<String>,
     },
     /// Empty entire stash
-    E {
+    Empty {
         /// skip confirmation
         #[arg(short = 'y', long = "yes")]
         skip_confirmation: bool,
@@ -26,7 +26,7 @@ pub enum Action {
     /// List stashed content keys
     LS,
     /// Get content from stash
-    G {
+    Get {
         /// key used when stashing content
         #[arg(value_name = "KEY")]
         key: String,
@@ -41,7 +41,7 @@ pub enum Action {
         pop: bool,
     },
     /// Push content to stash
-    P {
+    Push {
         /// a short string to remember the content by (needs to conform to the regex ^[a-z0-9_-]{1,30}$)
         #[arg(value_name = "KEY")]
         key: String,

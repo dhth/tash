@@ -33,12 +33,12 @@ cargo install --git https://github.com/dhth/tash.git
 Usage: tash <COMMAND>
 
 Commands:
-  d     Delete one or more content items
-  e     Empty entire stash
-  ls    List stashed content keys
-  g     Get content from stash
-  p     Push content to stash
-  help  Print this message or the help of the given subcommand(s)
+  delete  Delete one or more content items
+  empty   Empty entire stash
+  ls      List stashed content keys
+  get     Get content from stash
+  push    Push content to stash
+  help    Print this message or the help of the given subcommand(s)
 ```
 
 ### Basic Usage

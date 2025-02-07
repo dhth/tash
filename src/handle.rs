@@ -25,13 +25,13 @@ pub fn handle(args: Args) -> Result<(), AppError> {
     }
 
     match args.action {
-        Action::D { keys } => {
+        Action::Delete { keys } => {
             delete_content_items(&data_dir, &keys).map_err(DeleteContent)?;
         }
-        Action::E { skip_confirmation } => {
+        Action::Empty { skip_confirmation } => {
             empty_stash(&data_dir, skip_confirmation).map_err(EmptyStash)?;
         }
-        Action::G {
+        Action::Get {
             key,
             no_output,
             copy_to_clipboard,
@@ -42,7 +42,7 @@ pub fn handle(args: Args) -> Result<(), AppError> {
         Action::LS => {
             list_content(&data_dir).map_err(ListContent)?;
         }
-        Action::P {
+        Action::Push {
             key,
             data,
             file_path,
