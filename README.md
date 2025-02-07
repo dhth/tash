@@ -3,7 +3,7 @@
 [![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/build.yml?style=flat-square)](https://github.com/dhth/tash/actions/workflows/build.yml)
 [![Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/test.yml?style=flat-square&label=tests)](https://github.com/dhth/tash/actions/workflows/test.yml)
 
-`tash` "stashes" content that you can access later.
+`tash` s**tash**es content that you can access later.
 
 🤔 Motivation
 ---
@@ -33,6 +33,7 @@ cargo install --git https://github.com/dhth/tash.git
 Usage: tash <COMMAND>
 
 Commands:
+  d     Delete one or more content items
   e     Empty entire stash
   ls    List stashed content keys
   g     Get content from stash
@@ -79,6 +80,40 @@ tash g key --pop
 # list content saved to tash
 tash ls
 
+# delete content items
+tash d key1 key2 key3
+
 # empty tash's store
 tash e
+```
+
+### Fetch content using fzf
+
+The process of fetching content can be made easier by making use of a fuzzy
+finder like [fzf](https://github.com/junegunn/fzf).
+
+```bash
+#!/usr/bin/env bash
+
+selected_key=$(tash ls | fzf)
+
+if [ -z "$selected_key" ]; then
+    exit 0
+fi
+
+tash g "${selected_key}" -nc
+```
+
+### Delete multiple entries using fzf
+
+```bash
+#!/usr/bin/env bash
+
+selected_keys=$(tash ls | fzf --multi | xargs)
+
+if [ -z "$selected_keys" ]; then
+    exit 0
+fi
+
+tash d ${selected_keys}
 ```
