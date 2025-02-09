@@ -3,7 +3,7 @@
 [![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/build.yml?style=flat-square)](https://github.com/dhth/tash/actions/workflows/build.yml)
 [![Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/test.yml?style=flat-square&label=tests)](https://github.com/dhth/tash/actions/workflows/test.yml)
 
-`tash` s**tash**es content that you can access later.
+s**tash** content that you can access later.
 
 🤔 Motivation
 ---
@@ -37,7 +37,7 @@ Commands:
   empty   Empty entire stash
   ls      List stashed content keys
   get     Get content from stash
-  push    Push content to stash
+  push    Stash content
   help    Print this message or the help of the given subcommand(s)
 ```
 
@@ -45,9 +45,9 @@ Commands:
 
 ```bash
 # push content to tash from stdin
-echo -n "some content" | tash p key
+echo -n "some content" | tash push key
 
-cat << EOF | tash p key
+cat << EOF | tash push key
 Multi line
 content goes
 here.
@@ -113,6 +113,8 @@ tash get "${selected_key}" -nc
 ```
 
 ### Delete multiple entries using fzf
+
+Same for deletion for content.
 
 ```bash
 #!/usr/bin/env bash

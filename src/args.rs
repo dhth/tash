@@ -40,7 +40,7 @@ pub enum Action {
         #[arg(short = 'p', long = "pop")]
         pop: bool,
     },
-    /// Push content to stash
+    /// Stash content
     Push {
         /// a short string to remember the content by (needs to conform to the regex ^[a-z0-9_-]{1,30}$)
         #[arg(value_name = "KEY")]
