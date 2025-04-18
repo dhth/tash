@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-arboard = "3.4.1"
-clap = { version = "4.5.35", features = ["derive"] }
+arboard = "3.5.0"
+clap = { version = "4.5.36", features = ["derive"] }
 dirs = "6.0.0"
 regex = "1.11.1"
 thiserror = "2.0.12"
 
 [dev-dependencies]
-assert_cmd = "2.0.16"
+assert_cmd = "2.0.17"
 pretty_assertions = "1.4.1"
 tempfile = "3.19.1"
