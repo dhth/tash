@@ -3,13 +3,7 @@ name: audit
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * 0'
-  push:
-    branches: ["main"]
-    paths:
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - ".github/workflows/audit.yml"
+    - cron: '0 8 * * 6'
 
 jobs:
   audit:

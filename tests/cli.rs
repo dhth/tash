@@ -8,6 +8,7 @@ struct Fixture {
 }
 
 impl Fixture {
+    #[allow(clippy::expect_used)]
     fn new() -> Self {
         let tmp_dir = tempdir().expect("temporary directory should've been created");
         let tmp_dir_str = tmp_dir
