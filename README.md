@@ -1,7 +1,6 @@
 # tash
 
-[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/build.yml?style=flat-square)](https://github.com/dhth/tash/actions/workflows/build.yml)
-[![Tests Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/test.yml?style=flat-square&label=tests)](https://github.com/dhth/tash/actions/workflows/test.yml)
+[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/main.yml?style=flat-square)](https://github.com/dhth/tash/actions/workflows/main.yml)
 
 s**tash** content that you can access later.
 
