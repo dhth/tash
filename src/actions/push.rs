@@ -45,6 +45,7 @@ pub fn push_content(
     echo: bool,
     verbose: bool,
 ) -> Result<(), PushError> {
+    #[allow(clippy::expect_used)]
     let re = Regex::new(KEY_REGEX_STR).expect("regex is invalid");
     if !re.is_match(key) {
         return Err(PushError::IncorrectKeyProvided);
