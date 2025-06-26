@@ -2,6 +2,7 @@
 name = "tash"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
 arboard = "3.5.0"
