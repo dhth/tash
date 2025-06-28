@@ -34,7 +34,7 @@ pub fn list_content(data_dir: &PathBuf) -> Result<(), ListError> {
         .map(|os_str| os_str.to_string_lossy())
         .collect::<Vec<_>>()
         .join("\n");
-    println!("{}", output);
+    println!("{output}");
 
     Ok(())
 }

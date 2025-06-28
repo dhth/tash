@@ -46,7 +46,7 @@ pub fn get_content(
         .map_err(GetError::CouldntReadFile)?;
 
     if !no_output {
-        print!("{}", contents);
+        print!("{contents}");
     }
 
     if copy_to_clipboard {

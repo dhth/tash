@@ -60,7 +60,7 @@ fn pushing_content_from_flag_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
 }
@@ -83,7 +83,7 @@ fn pushing_content_from_local_file_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
 }
@@ -107,7 +107,7 @@ fn pushing_and_echoing_content_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -132,7 +132,7 @@ fn listing_from_an_empty_stash_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -166,7 +166,7 @@ fn getting_content_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -215,7 +215,7 @@ fn getting_content_and_popping_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -230,7 +230,7 @@ Content goes here."#
     if second_cmd_output.status.success() {
         let stdout = String::from_utf8(second_cmd_output.stdout)
             .expect("a string should've been created from the second command stdout");
-        println!("stdout: \n{}", stdout);
+        println!("stdout: \n{stdout}");
     }
     assert!(
         !second_cmd_output.status.success(),
@@ -269,7 +269,7 @@ fn listing_content_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -321,14 +321,14 @@ fn deleting_content_items_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "delete output wasn't a success");
 
     if !ls_output.status.success() {
         let stderr = String::from_utf8(ls_output.stderr)
             .expect("a string should've been created from ls_command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(ls_output.status.success(), "ls_output wasn't a success");
     let ls_stdout = String::from_utf8(ls_output.stdout)
@@ -365,7 +365,7 @@ fn emptying_stash_works() {
     if !output.status.success() {
         let stderr = String::from_utf8(output.stderr)
             .expect("a string should've been created from command stderr");
-        println!("stderr: \n{}", stderr);
+        println!("stderr: \n{stderr}");
     }
     assert!(output.status.success(), "output wasn't a success");
     let stdout =
@@ -404,7 +404,7 @@ fn fails_if_key_doesnt_conform_to_regex() {
         if output.status.success() {
             let stdout = String::from_utf8(output.stdout)
                 .expect("a string should've been created from command stdout");
-            println!("stdout: \n{}", stdout);
+            println!("stdout: \n{stdout}");
         }
         assert!(!output.status.success(), "output wasn't a failure");
         let stderr = String::from_utf8(output.stderr)
@@ -430,7 +430,7 @@ fn fails_if_key_doesnt_exist() {
     if output.status.success() {
         let stdout = String::from_utf8(output.stdout)
             .expect("a string should've been created from command stdout");
-        println!("stdout: \n{}", stdout);
+        println!("stdout: \n{stdout}");
     }
     assert!(!output.status.success(), "output wasn't a failure");
     let stderr =
@@ -466,7 +466,7 @@ fn fails_if_content_overwrites_are_not_desired() {
     if output.status.success() {
         let stdout = String::from_utf8(output.stdout)
             .expect("a string should've been created from command stdout");
-        println!("stdout: \n{}", stdout);
+        println!("stdout: \n{stdout}");
     }
     assert!(!output.status.success(), "output wasn't a failure");
     let stderr =
@@ -504,7 +504,7 @@ fn deletion_fails_if_one_or_more_keys_dont_exist() {
     if output.status.success() {
         let stdout = String::from_utf8(output.stdout)
             .expect("a string should've been created from command stdout");
-        println!("stdout: \n{}", stdout);
+        println!("stdout: \n{stdout}");
     }
     assert!(!output.status.success(), "output wasn't a failure");
     let stderr =

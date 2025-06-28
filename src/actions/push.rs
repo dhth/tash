@@ -105,7 +105,7 @@ pub fn push_content(
 
     if echo {
         let content_str = String::from_utf8(content).map_err(PushError::CouldntEchoContent)?;
-        print!("{}", content_str);
+        print!("{content_str}");
     }
 
     Ok(())

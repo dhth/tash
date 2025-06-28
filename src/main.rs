@@ -13,15 +13,14 @@ fn main() {
     let result = handle(args);
 
     if let Err(error) = &result {
-        eprintln!("Error: {}", error);
+        eprintln!("Error: {error}");
         if let Some(c) = error.code() {
             eprintln!(
                 "
 ------
 
-This error (code: {}) is unexpected.
-Let @dhth know about this via https://github.com/dhth/tash/issues",
-                c
+This error (code: {c}) is unexpected.
+Let @dhth know about this via https://github.com/dhth/tash/issues"
             );
         }
         std::process::exit(1);
