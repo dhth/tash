@@ -28,8 +28,7 @@ pub fn empty_stash(data_dir: &PathBuf, skip_confirmation: bool) -> Result<(), Em
 
     if !skip_confirmation {
         println!(
-            "This will permanently delete {} {} from the stash. Enter \"yes\" to continue.",
-            file_count, entry_str
+            "This will permanently delete {file_count} {entry_str} from the stash. Enter \"yes\" to continue."
         );
 
         let mut input = String::new();
@@ -46,7 +45,7 @@ pub fn empty_stash(data_dir: &PathBuf, skip_confirmation: bool) -> Result<(), Em
     }
 
     std::fs::remove_dir_all(data_dir).map_err(EmptyError::DeleteDataDir)?;
-    println!("Deleted {} {}", file_count, entry_str);
+    println!("Deleted {file_count} {entry_str}");
 
     Ok(())
 }
