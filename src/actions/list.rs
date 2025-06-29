@@ -27,6 +27,10 @@ pub fn list_content(data_dir: &PathBuf) -> Result<(), ListError> {
         }
     }
 
+    if stashed_files.is_empty() {
+        return Ok(());
+    }
+
     stashed_files.sort();
 
     let output = stashed_files

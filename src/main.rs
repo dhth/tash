@@ -1,6 +1,5 @@
 mod actions;
 mod args;
-mod common;
 mod errors;
 mod handle;
 
