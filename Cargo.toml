@@ -12,7 +12,7 @@ regex = "1.11.1"
 thiserror = "2.0.12"
 
 [dev-dependencies]
-insta = { version = "1.43.1", features = ["yaml"] }
+insta = "1.43.1"
 insta-cmd = "0.6.0"
 tempfile = "3.20.0"
 
