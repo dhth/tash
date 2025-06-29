@@ -1,6 +1,7 @@
-use assert_cmd::Command;
-use pretty_assertions::assert_eq;
+use insta_cmd::assert_cmd_snapshot;
 use tempfile::{tempdir, TempDir};
+
+mod common;
 
 struct Fixture {
     _tmp_dir: TempDir,
@@ -31,121 +32,122 @@ impl Fixture {
 #[test]
 fn shows_help() {
     // GIVEN
-    // WHEN
-    let mut cmd = Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap();
+    let mut cmd = common::base_command();
     cmd.arg("--help");
-    let output = cmd.output().expect("running command failed");
 
+    // WHEN
     // THEN
-    assert!(output.status.success());
-    let stdout = String::from_utf8(output.stdout).expect("invalid utf-8 stdout");
-    assert!(stdout.contains("tash \"stashes\" content that you can access later"));
+    assert_cmd_snapshot!(cmd, @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    tash "stashes" content that you can access later
+
+    Usage: tash <COMMAND>
+
+    Commands:
+      delete  Delete one or more content items
+      empty   Empty entire stash
+      ls      List stashed content keys
+      get     Get content from stash
+      push    Stash content
+      help    Print this message or the help of the given subcommand(s)
+
+    Options:
+      -h, --help  Print help
+
+    ----- stderr -----
+    "#);
 }
 
 #[test]
 fn pushing_content_from_flag_works() {
     // GIVEN
     let fixture = Fixture::new();
-
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
-    let output = cmd.output().expect("command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn pushing_content_from_local_file_works() {
     // GIVEN
     let fixture = Fixture::new();
-
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-f=tests/sample.txt");
-    let output = cmd.output().expect("command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn pushing_and_echoing_content_works() {
     // GIVEN
     let fixture = Fixture::new();
-
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
     cmd.arg("-e");
-    let output = cmd.output().expect("command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert_eq!(stdout.as_str(), "content goes here");
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    content goes here
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn listing_from_an_empty_stash_works() {
     // GIVEN
     let fixture = Fixture::new();
-
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("ls");
-    cmd.output().expect("command should've been executed");
-    let output = cmd.output().expect("command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert!(stdout.as_str().trim().is_empty())
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn getting_content_works() {
     // GIVEN
     let fixture = Fixture::new();
-    let mut push_cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("push command should've been created");
+    let mut push_cmd = common::base_command();
     push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     push_cmd.arg("push");
     push_cmd.arg("key");
@@ -154,37 +156,30 @@ fn getting_content_works() {
         .output()
         .expect("push command should've been executed");
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("get");
     cmd.arg("key");
-    let output = cmd.output().expect("get command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert_eq!(
-        stdout.as_str().trim(),
-        r#"A sample file for tash.
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    A sample file for tash.
 
-Content goes here."#
-    )
+    Content goes here.
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn getting_content_and_popping_works() {
     // GIVEN
     let fixture = Fixture::new();
-    let mut push_cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("push command should've been created");
+    let mut push_cmd = common::base_command();
     push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     push_cmd.arg("push");
     push_cmd.arg("key");
@@ -193,52 +188,37 @@ fn getting_content_and_popping_works() {
         .output()
         .expect("push command should've been executed");
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("get");
     cmd.arg("key");
     cmd.arg("-p");
-    let output = cmd.output().expect("get command should've been executed");
 
-    let mut second_get_cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    let mut second_get_cmd = common::base_command();
     second_get_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     second_get_cmd.arg("get");
     second_get_cmd.arg("key");
-    let second_cmd_output = second_get_cmd
-        .output()
-        .expect("second get command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert_eq!(
-        stdout.as_str().trim(),
-        r#"A sample file for tash.
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    A sample file for tash.
 
-Content goes here."#
-    );
+    Content goes here.
 
-    if second_cmd_output.status.success() {
-        let stdout = String::from_utf8(second_cmd_output.stdout)
-            .expect("a string should've been created from the second command stdout");
-        println!("stdout: \n{stdout}");
-    }
-    assert!(
-        !second_cmd_output.status.success(),
-        "second cmd wasn't a failure"
-    );
-    let stderr = String::from_utf8(second_cmd_output.stderr)
-        .expect("a string should've been created from cmd stderr");
-    assert!(stderr.as_str().contains("key doesn't exist in stash"));
+    ----- stderr -----
+    ");
+    assert_cmd_snapshot!(second_get_cmd, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: couldn't get content: key doesn't exist in stash
+    ");
 }
 
 #[test]
@@ -247,8 +227,7 @@ fn listing_content_works() {
     let fixture = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
-            .expect("push command should've been created");
+        let mut push_cmd = common::base_command();
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
         push_cmd.arg("push");
         push_cmd.arg(key);
@@ -258,29 +237,22 @@ fn listing_content_works() {
             .expect("push command should've been executed");
     }
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("ls command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("ls");
-    let output = cmd.output().expect("ls command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert_eq!(
-        stdout.as_str(),
-        r#"key-a
-key-b
-key-c
-"#
-    )
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    key-a
+    key-b
+    key-c
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
@@ -289,8 +261,7 @@ fn deleting_content_items_works() {
     let fixture = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
-            .expect("push command should've been created");
+        let mut push_cmd = common::base_command();
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
         push_cmd.arg("push");
         push_cmd.arg(key);
@@ -300,40 +271,33 @@ fn deleting_content_items_works() {
             .expect("push command should've been executed");
     }
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("delete command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("delete");
     cmd.arg("key-a");
     cmd.arg("key-b");
-    let output = cmd
-        .output()
-        .expect("delete command should've been executed");
 
-    let mut ls_cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("ls command should've been created");
+    let mut ls_cmd = common::base_command();
     ls_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     ls_cmd.arg("ls");
-    let ls_output = ls_cmd.output().expect("ls command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "delete output wasn't a success");
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
 
-    if !ls_output.status.success() {
-        let stderr = String::from_utf8(ls_output.stderr)
-            .expect("a string should've been created from ls_command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(ls_output.status.success(), "ls_output wasn't a success");
-    let ls_stdout = String::from_utf8(ls_output.stdout)
-        .expect("a string should've been created from ls_cmd stdout");
-    assert_eq!(ls_stdout.as_str().trim(), "key-c")
+    ----- stderr -----
+    ");
+    assert_cmd_snapshot!(ls_cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    key-c
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
@@ -342,8 +306,7 @@ fn emptying_stash_works() {
     let fixture = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
-            .expect("push command should've been created");
+        let mut push_cmd = common::base_command();
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
         push_cmd.arg("push");
         push_cmd.arg(key);
@@ -353,24 +316,21 @@ fn emptying_stash_works() {
             .expect("push command should've been executed");
     }
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("empty command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("empty");
     cmd.arg("-y");
-    let output = cmd.output().expect("empty command should've been executed");
 
+    // WHEN
     // THEN
-    if !output.status.success() {
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from command stderr");
-        println!("stderr: \n{stderr}");
-    }
-    assert!(output.status.success(), "output wasn't a success");
-    let stdout =
-        String::from_utf8(output.stdout).expect("a string should've been created from cmd stdout");
-    assert_eq!(stdout.as_str().trim(), "Deleted 3 entries");
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    Deleted 3 entries
+
+    ----- stderr -----
+    ");
 }
 
 //------------//
@@ -390,26 +350,25 @@ fn fails_if_key_doesnt_conform_to_regex() {
         "incorrect,key",
     ];
 
-    for incorrect_key in incorrect_keys {
-        // WHEN
-        let mut cmd =
-            Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
-        cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        cmd.arg("push");
-        cmd.arg(incorrect_key);
-        cmd.arg("-f=tests/sample.txt");
-        let output = cmd.output().expect("get command should've been executed");
+    insta::allow_duplicates! {
+        for incorrect_key in incorrect_keys {
+            let mut cmd = common::base_command();
+            cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
+            cmd.arg("push");
+            cmd.arg(incorrect_key);
+            cmd.arg("-f=tests/sample.txt");
 
-        // THEN
-        if output.status.success() {
-            let stdout = String::from_utf8(output.stdout)
-                .expect("a string should've been created from command stdout");
-            println!("stdout: \n{stdout}");
+            // WHEN
+            // THEN
+            assert_cmd_snapshot!(cmd, @r"
+        success: false
+        exit_code: 1
+        ----- stdout -----
+
+        ----- stderr -----
+        Error: couldn't push content: incorrect key provided (valid regex: ^[a-z0-9_-]{1,30}$)
+        ");
         }
-        assert!(!output.status.success(), "output wasn't a failure");
-        let stderr = String::from_utf8(output.stderr)
-            .expect("a string should've been created from cmd stderr");
-        assert!(stderr.as_str().contains("incorrect key provided"));
     }
 }
 
@@ -417,33 +376,28 @@ fn fails_if_key_doesnt_conform_to_regex() {
 fn fails_if_key_doesnt_exist() {
     // GIVEN
     let fixture = Fixture::new();
-
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("get");
     cmd.arg("non-existent-key");
-    let output = cmd.output().expect("get command should've been executed");
 
+    // WHEN
     // THEN
-    if output.status.success() {
-        let stdout = String::from_utf8(output.stdout)
-            .expect("a string should've been created from command stdout");
-        println!("stdout: \n{stdout}");
-    }
-    assert!(!output.status.success(), "output wasn't a failure");
-    let stderr =
-        String::from_utf8(output.stderr).expect("a string should've been created from cmd stderr");
-    assert!(stderr.as_str().contains("key doesn't exist in stash"));
+    assert_cmd_snapshot!(cmd, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: couldn't get content: key doesn't exist in stash
+    ");
 }
 
 #[test]
 fn fails_if_content_overwrites_are_not_desired() {
     // GIVEN
     let fixture = Fixture::new();
-    let mut first_push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
-        .expect("first push command should've been created");
+    let mut first_push_cmd = common::base_command();
     first_push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     first_push_cmd.arg("push");
     first_push_cmd.arg("key");
@@ -452,26 +406,23 @@ fn fails_if_content_overwrites_are_not_desired() {
         .output()
         .expect("first push command should've been executed");
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("push");
     cmd.arg("key");
     cmd.arg("-d=content goes here");
     cmd.arg("-p");
-    let output = cmd.output().expect("command should've been executed");
 
+    // WHEN
     // THEN
-    if output.status.success() {
-        let stdout = String::from_utf8(output.stdout)
-            .expect("a string should've been created from command stdout");
-        println!("stdout: \n{stdout}");
-    }
-    assert!(!output.status.success(), "output wasn't a failure");
-    let stderr =
-        String::from_utf8(output.stderr).expect("a string should've been created from cmd stderr");
-    assert!(stderr.as_str().contains("key already exists in the stash"));
+    assert_cmd_snapshot!(cmd, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: couldn't push content: key already exists in the stash
+    ");
 }
 
 #[test]
@@ -480,8 +431,7 @@ fn deletion_fails_if_one_or_more_keys_dont_exist() {
     let fixture = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = Command::cargo_bin(env!("CARGO_PKG_NAME"))
-            .expect("push command should've been created");
+        let mut push_cmd = common::base_command();
         push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
         push_cmd.arg("push");
         push_cmd.arg(key);
@@ -491,23 +441,20 @@ fn deletion_fails_if_one_or_more_keys_dont_exist() {
             .expect("push command should've been executed");
     }
 
-    // WHEN
-    let mut cmd =
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("get command should've been created");
+    let mut cmd = common::base_command();
     cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
     cmd.arg("delete");
     cmd.arg("non-existent-key");
     cmd.arg("key-b");
-    let output = cmd.output().expect("get command should've been executed");
 
+    // WHEN
     // THEN
-    if output.status.success() {
-        let stdout = String::from_utf8(output.stdout)
-            .expect("a string should've been created from command stdout");
-        println!("stdout: \n{stdout}");
-    }
-    assert!(!output.status.success(), "output wasn't a failure");
-    let stderr =
-        String::from_utf8(output.stderr).expect("a string should've been created from cmd stderr");
-    assert!(stderr.as_str().contains("keys don't exist in stash"));
+    assert_cmd_snapshot!(cmd, @r#"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: couldn't delete content: keys don't exist in stash: ["non-existent-key"]
+    "#);
 }
