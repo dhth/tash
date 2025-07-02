@@ -1,29 +1,7 @@
+use common::Fixture;
 use insta_cmd::assert_cmd_snapshot;
-use tempfile::{tempdir, TempDir};
 
 mod common;
-
-struct Fixture {
-    _tmp_dir: TempDir,
-    tmp_dir_str: String,
-}
-
-impl Fixture {
-    #[allow(clippy::expect_used)]
-    fn new() -> Self {
-        let tmp_dir = tempdir().expect("temporary directory should've been created");
-        let tmp_dir_str = tmp_dir
-            .path()
-            .to_str()
-            .expect("temporary directory should've been converted to a string")
-            .to_string();
-
-        Self {
-            _tmp_dir: tmp_dir,
-            tmp_dir_str,
-        }
-    }
-}
 
 //-------------//
 //  SUCCESSES  //
@@ -32,8 +10,8 @@ impl Fixture {
 #[test]
 fn shows_help() {
     // GIVEN
-    let mut cmd = common::base_command();
-    cmd.arg("--help");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["--help"]);
 
     // WHEN
     // THEN
@@ -63,12 +41,8 @@ fn shows_help() {
 #[test]
 fn pushing_content_from_flag_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("push");
-    cmd.arg("key");
-    cmd.arg("-d=content goes here");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["push", "key", "--data", "content goes here"]);
 
     // WHEN
     // THEN
@@ -84,12 +58,8 @@ fn pushing_content_from_flag_works() {
 #[test]
 fn pushing_content_from_local_file_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("push");
-    cmd.arg("key");
-    cmd.arg("-f=tests/sample.txt");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["push", "key", "--file-path", "tests/sample.txt"]);
 
     // WHEN
     // THEN
@@ -105,13 +75,8 @@ fn pushing_content_from_local_file_works() {
 #[test]
 fn pushing_and_echoing_content_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("push");
-    cmd.arg("key");
-    cmd.arg("-d=content goes here");
-    cmd.arg("-e");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["push", "key", "--data", "content goes here", "--echo"]);
 
     // WHEN
     // THEN
@@ -127,10 +92,8 @@ fn pushing_and_echoing_content_works() {
 #[test]
 fn listing_from_an_empty_stash_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("ls");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["ls"]);
 
     // WHEN
     // THEN
@@ -146,20 +109,13 @@ fn listing_from_an_empty_stash_works() {
 #[test]
 fn getting_content_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut push_cmd = common::base_command();
-    push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    push_cmd.arg("push");
-    push_cmd.arg("key");
-    push_cmd.arg("-f=tests/sample.txt");
+    let fx = Fixture::new();
+    let mut push_cmd = fx.cmd(["push", "key", "--file-path", "tests/sample.txt"]);
     push_cmd
         .output()
         .expect("push command should've been executed");
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("get");
-    cmd.arg("key");
+    let mut cmd = fx.cmd(["get", "key"]);
 
     // WHEN
     // THEN
@@ -178,26 +134,14 @@ fn getting_content_works() {
 #[test]
 fn getting_content_and_popping_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut push_cmd = common::base_command();
-    push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    push_cmd.arg("push");
-    push_cmd.arg("key");
-    push_cmd.arg("-f=tests/sample.txt");
+    let fx = Fixture::new();
+    let mut push_cmd = fx.cmd(["push", "key", "--file-path", "tests/sample.txt"]);
     push_cmd
         .output()
         .expect("push command should've been executed");
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("get");
-    cmd.arg("key");
-    cmd.arg("-p");
-
-    let mut second_get_cmd = common::base_command();
-    second_get_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    second_get_cmd.arg("get");
-    second_get_cmd.arg("key");
+    let mut cmd = fx.cmd(["get", "key", "--pop"]);
+    let mut second_get_cmd = fx.cmd(["get", "key"]);
 
     // WHEN
     // THEN
@@ -224,22 +168,16 @@ fn getting_content_and_popping_works() {
 #[test]
 fn listing_content_works() {
     // GIVEN
-    let fixture = Fixture::new();
+    let fx = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = common::base_command();
-        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("push");
-        push_cmd.arg(key);
-        push_cmd.arg("-f=tests/sample.txt");
+        let mut push_cmd = fx.cmd(["push", key, "--file-path", "tests/sample.txt"]);
         push_cmd
             .output()
             .expect("push command should've been executed");
     }
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("ls");
+    let mut cmd = fx.cmd(["ls"]);
 
     // WHEN
     // THEN
@@ -258,28 +196,18 @@ fn listing_content_works() {
 #[test]
 fn deleting_content_items_works() {
     // GIVEN
-    let fixture = Fixture::new();
+    let fx = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = common::base_command();
-        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("push");
-        push_cmd.arg(key);
-        push_cmd.arg("-f=tests/sample.txt");
+        let mut push_cmd = fx.cmd(["push", key, "--file-path", "tests/sample.txt"]);
         push_cmd
             .output()
             .expect("push command should've been executed");
     }
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("delete");
-    cmd.arg("key-a");
-    cmd.arg("key-b");
+    let mut cmd = fx.cmd(["delete", "key-a", "key-b"]);
 
-    let mut ls_cmd = common::base_command();
-    ls_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    ls_cmd.arg("ls");
+    let mut ls_cmd = fx.cmd(["ls"]);
 
     // WHEN
     // THEN
@@ -303,23 +231,16 @@ fn deleting_content_items_works() {
 #[test]
 fn emptying_stash_works() {
     // GIVEN
-    let fixture = Fixture::new();
+    let fx = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = common::base_command();
-        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("push");
-        push_cmd.arg(key);
-        push_cmd.arg("-f=tests/sample.txt");
+        let mut push_cmd = fx.cmd(["push", key, "--file-path", "tests/sample.txt"]);
         push_cmd
             .output()
             .expect("push command should've been executed");
     }
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("empty");
-    cmd.arg("-y");
+    let mut cmd = fx.cmd(["empty", "--yes"]);
 
     // WHEN
     // THEN
@@ -340,7 +261,7 @@ fn emptying_stash_works() {
 #[test]
 fn fails_if_key_doesnt_conform_to_regex() {
     // GIVEN
-    let fixture = Fixture::new();
+    let fx = Fixture::new();
     let incorrect_keys = vec![
         "incorrect key",
         "inco!!rectkey",
@@ -352,11 +273,7 @@ fn fails_if_key_doesnt_conform_to_regex() {
 
     insta::allow_duplicates! {
         for incorrect_key in incorrect_keys {
-            let mut cmd = common::base_command();
-            cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-            cmd.arg("push");
-            cmd.arg(incorrect_key);
-            cmd.arg("-f=tests/sample.txt");
+            let mut cmd = fx.cmd(["push", incorrect_key, "--file-path", "tests/sample.txt"]);
 
             // WHEN
             // THEN
@@ -375,11 +292,8 @@ fn fails_if_key_doesnt_conform_to_regex() {
 #[test]
 fn fails_if_key_doesnt_exist() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("get");
-    cmd.arg("non-existent-key");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["get", "non-existent-key"]);
 
     // WHEN
     // THEN
@@ -396,22 +310,20 @@ fn fails_if_key_doesnt_exist() {
 #[test]
 fn fails_if_content_overwrites_are_not_desired() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut first_push_cmd = common::base_command();
-    first_push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    first_push_cmd.arg("push");
-    first_push_cmd.arg("key");
-    first_push_cmd.arg("-d=\"content goes here\"");
+    let fx = Fixture::new();
+    let mut first_push_cmd = fx.cmd(["push", "key", "--data", "content goes here"]);
+
     first_push_cmd
         .output()
-        .expect("first push command should've been executed");
+        .expect("push command should've been executed");
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("push");
-    cmd.arg("key");
-    cmd.arg("-d=content goes here");
-    cmd.arg("-p");
+    let mut cmd = fx.cmd([
+        "push",
+        "key",
+        "--data",
+        "content goes here",
+        "--prevent-overwrite",
+    ]);
 
     // WHEN
     // THEN
@@ -428,24 +340,16 @@ fn fails_if_content_overwrites_are_not_desired() {
 #[test]
 fn deletion_fails_if_one_or_more_keys_dont_exist() {
     // GIVEN
-    let fixture = Fixture::new();
+    let fx = Fixture::new();
     let keys = vec!["key-b", "key-c", "key-a"];
     for key in keys {
-        let mut push_cmd = common::base_command();
-        push_cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-        push_cmd.arg("push");
-        push_cmd.arg(key);
-        push_cmd.arg("-f=tests/sample.txt");
+        let mut push_cmd = fx.cmd(["push", key, "--file-path", "tests/sample.txt"]);
         push_cmd
             .output()
             .expect("push command should've been executed");
     }
 
-    let mut cmd = common::base_command();
-    cmd.env("TASH_DATA_DIR", &fixture.tmp_dir_str);
-    cmd.arg("delete");
-    cmd.arg("non-existent-key");
-    cmd.arg("key-b");
+    let mut cmd = fx.cmd(["delete", "non-existent-key", "key-b"]);
 
     // WHEN
     // THEN
