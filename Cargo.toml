@@ -14,7 +14,7 @@ thiserror = "2.0.15"
 [dev-dependencies]
 insta = "1.43.1"
 insta-cmd = "0.6.0"
-tempfile = "3.20.0"
+tempfile = "3.21.0"
 
 [profile.dev.package]
 insta.opt-level = 3
