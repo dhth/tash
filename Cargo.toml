@@ -1,8 +1,22 @@
 [package]
 name = "tash"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "MIT"
+repository = "https://github.com/dhth/tash"
+description = "stash content that you can access later"
+homepage = "https://tools.dhruvs.space/tash/"
+keywords = [
+    "cli",
+]
+categories = [
+    "command-line-utilities",
+]
+exclude = [
+    ".github",
+    "deny.toml",
+    "justfile",
+]
 
 [dependencies]
 arboard = "3.6.1"
@@ -24,6 +38,10 @@ similar.opt-level = 3
 codegen-units = 1
 lto = "fat"
 strip = "symbols"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
 
 [lints.clippy]
 unwrap_used = "deny"
