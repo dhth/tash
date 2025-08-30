@@ -1,7 +1,7 @@
 use insta_cmd::get_cargo_bin;
 use std::ffi::OsStr;
 use std::process::Command;
-use tempfile::{tempdir, TempDir};
+use tempfile::{TempDir, tempdir};
 
 #[cfg(test)]
 pub struct Fixture {

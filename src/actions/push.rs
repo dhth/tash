@@ -59,7 +59,7 @@ pub fn push_content(
 
     let content = match (data, file_path, get_content_from_clipboard) {
         (Some(_), Some(_), true) | (Some(_), Some(_), false) | (Some(_), None, true) => {
-            return Err(PushError::MultipleInputSourcesProvided)
+            return Err(PushError::MultipleInputSourcesProvided);
         }
         (None, Some(p), false) => {
             let mut file = File::open(p).map_err(PushError::CouldntOpenFile)?;
