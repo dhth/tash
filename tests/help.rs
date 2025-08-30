@@ -14,11 +14,11 @@ fn shows_help() {
 
     // WHEN
     // THEN
-    assert_cmd_snapshot!(cmd, @r#"
+    assert_cmd_snapshot!(cmd, @r"
     success: true
     exit_code: 0
     ----- stdout -----
-    tash "stashes" content that you can access later
+    s[tash] content that you can access later
 
     Usage: tash <COMMAND>
 
@@ -34,5 +34,5 @@ fn shows_help() {
       -h, --help  Print help
 
     ----- stderr -----
-    "#);
+    ");
 }

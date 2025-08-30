@@ -1,8 +1,7 @@
 use clap::{Parser, Subcommand};
 
-/// tash "stashes" content that you can access later
 #[derive(Parser, Debug)]
-#[command(about)]
+#[command(about("s[tash] content that you can access later"))]
 pub struct Args {
     /// action to take
     #[command(subcommand)]
