@@ -1,8 +1,14 @@
-# tash
+<p align="center">
+  <h1 align="center">tash</h1>
+  <p align="center">
+    <a href="https://github.com/dhth/tash/actions/workflows/main.yml"><img alt="GitHub release" src="https://img.shields.io/github/actions/workflow/status/dhth/tash/main.yml?style=flat-square"></a>
+    <a href="https://crates.io/crates/tash"><img alt="GitHub release" src="https://img.shields.io/crates/v/tash?style=flat-square"></a>
+    <a href="https://github.com/dhth/tash/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/release/dhth/tash.svg?style=flat-square"></a>
+    <a href="https://github.com/dhth/tash/releases"><img alt="Commits since latest release" src="https://img.shields.io/github/commits-since/dhth/tash/latest?style=flat-square"></a>
+  </p>
+</p>
 
-[![Build Workflow Status](https://img.shields.io/github/actions/workflow/status/dhth/tash/main.yml?style=flat-square)](https://github.com/dhth/tash/actions/workflows/main.yml)
-
-s**tash** content that you can access later.
+`s[tash]` content that you can access later.
 
 🤔 Motivation
 ---
@@ -17,11 +23,21 @@ would make saving and querying string content quick and easy. So, I wrote
 💾 Installation
 ---
 
+**homebrew**:
+
+```sh
+brew install dhth/tap/tash
+```
+
 **cargo**:
 
 ```sh
-cargo install --git https://github.com/dhth/tash.git
+cargo install tash
 ```
+
+Or get the binaries directly from a Github [release][1]. Read more about
+verifying the authenticity of released artifacts
+[here](#-verifying-release-artifacts).
 
 ⚡️ Usage
 ---
@@ -136,3 +152,45 @@ fi
 
 tash delete ${selected_keys}
 ```
+
+🔐 Verifying release artifacts
+---
+
+In case you get the `tash` binary directly from a [release][1], you may want
+to verify its authenticity. Checksums are applied to all released artifacts, and
+the resulting checksum file is attested using [Github Attestations][2].
+
+Steps to verify (replace `A.B.C` in the commands below with the version you
+want):
+
+1. Download the sha256 checksum file for your platform from the release:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/tash/releases/download/vA.B.C/tash-x86_64-unknown-linux-gnu.tar.xz.sha256
+   ```
+
+2. Verify the integrity of the checksum file using [gh][3].
+
+   ```shell
+   gh attestation verify tash-x86_64-unknown-linux-gnu.tar.xz.sha256 --repo dhth/tash
+   ```
+
+3. Download the compressed archive you want, and validate its checksum:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/tash/releases/download/vA.B.C/tash-x86_64-unknown-linux-gnu.tar.xz
+   sha256sum --ignore-missing -c tash-x86_64-unknown-linux-gnu.tar.xz.sha256
+   ```
+
+3. If checksum validation goes through, uncompress the archive:
+
+   ```shell
+   tar -xzf tash-x86_64-unknown-linux-gnu.tar.xz
+   cd tash-x86_64-unknown-linux-gnu
+   ./tash -h
+   # profit!
+   ```
+
+[1]: https://github.com/dhth/tash/releases
+[2]: https://github.blog/news-insights/product-news/introducing-artifact-attestations-now-in-public-beta/
+[3]: https://github.com/cli/cli
