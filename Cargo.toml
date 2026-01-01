@@ -26,9 +26,9 @@ regex = "1.12.2"
 thiserror = "2.0.17"
 
 [dev-dependencies]
-insta = "1.44.3"
+insta = "1.45.1"
 insta-cmd = "0.6.0"
-tempfile = "3.23.0"
+tempfile = "3.24.0"
 
 [profile.dev.package]
 insta.opt-level = 3
